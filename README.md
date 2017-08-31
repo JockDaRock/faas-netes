@@ -1,19 +1,28 @@
 faas-netes
 ===========
 
-This is a plugin to enable Kubernetes as a [FaaS](https://github.com/alexellis/faas) backend. The existing CLI and UI are fully compatible. It also opens up the possibility for other plugins to be built for orchestation frameworks such as Nomad and Mesos/Marathon.
+This is a plugin to enable Kubernetes as an [OpenFaaS](https://github.com/alexellis/faas) backend. The existing CLI and UI are fully compatible. It also opens up the possibility for other plugins to be built for orchestation frameworks such as Nomad,  Mesos/Marathon or even a cloud-managed back-end such as Hyper.sh or Azure ACI.
+
+**Update:** [Watch the demo and intro to the CNCF Serverless Workgroup](https://youtu.be/SwRjPiqpFTk?t=1m8s)
+
+[OpenFaaS](https://github.com/alexellis/faas) is an event-driven serverless framework for containers. Any container for Windows or Linux can be leveraged as a serverless function. OpenFaaS is quick and easy to deploy (less than 60 secs) and lets you avoid writing boiler-plate code.
 
 ![Stack](https://camo.githubusercontent.com/08bc7c0c4f882ef5eadaed797388b27b1a3ca056/68747470733a2f2f7062732e7477696d672e636f6d2f6d656469612f4446726b46344e586f41414a774e322e6a7067)
 
-[FaaS](https://github.com/alexellis/faas) is an event-driven serverless framework for containers. Any container for Windows or Linux can be leveraged as a serverless function. FaaS is quick and easy to deploy (less than 60 secs) and lets you avoid writing boiler-plate code.
 
 In this README you'll find a technical overview and instructions for deploying FaaS on a Kubernetes cluster but Docker Swarm is also natively supported. 
 
-You can watch my intro from [the Dockercon closing keynote with Alexa, Twitter and Github demos](https://www.youtube.com/watch?v=-h2VTE9WnZs&t=910s) or a [complete walk-through of FaaS-netes](https://www.youtube.com/watch?v=0DbrLsUvaso) showing Prometheus, auto-scaling, the UI and CLI in action.
-
 ![FaaS](https://pbs.twimg.com/media/DFhYYP-XUAIWBET.jpg:large)
 
-If you'd like to know more about the FaaS project head over to - https://github.com/alexellis/faas
+You can watch my intro from [the Dockercon closing keynote with Alexa, Twitter and Github demos](https://www.youtube.com/watch?v=-h2VTE9WnZs&t=910s) or a [complete walk-through of FaaS-netes](https://www.youtube.com/watch?v=0DbrLsUvaso) showing Prometheus, auto-scaling, the UI and CLI in action.
+
+If you'd like to know more about the OpenFaaS project head over to - https://github.com/alexellis/faas
+
+### QuickStart
+
+If you're looking to just get OpenFaaS deployed on Kubernetes follow the [QuickStart guide](https://github.com/alexellis/faas/blob/master/guide/deployment_k8s.md) or read on for a technical overview.
+
+### Technical overview
 
 The code in this repository is a daemon or micro-service which can provide the basic functionality the FaaS Gateway requires:
 
@@ -22,17 +31,14 @@ The code in this repository is a daemon or micro-service which can provide the b
 * Delete function
 * Invoke function synchronously
 
-Any other metrics or UI components will be maintained separately in the main FaaS project.
+Any other metrics or UI components will be maintained separately in the main OpenFaaS project.
 
-
-### Technical overview
-
-Motivation for separate micro-service:
+**Motivation for separate micro-service:**
 
 * Kubernetes go-client is 41MB with only a few lines of code
 * After including the go-client the code takes > 2mins to compile
 
-So rather than inflating the original project's source-code this micro-service will act as a co-operator or plug-in. Some additional changes will be needed in the main FaaS project to switch between implementations.
+So rather than inflating the original project's source-code this micro-service will act as a co-operator or plug-in. Some additional changes will be needed in the main OpenFaaS project to switch between implementations.
 
 ![](https://pbs.twimg.com/media/DFh7i-ZXkAAZkw4.jpg:large)
 
@@ -75,17 +81,17 @@ $ kubectl apply -f ./rbac.yml
 
 You have three options for deploying a function:
 
-* Via the FaaS CLI 
+* Via the OpenFaaS CLI 
 
-The CLI can build FaaS functions into Docker images that you can share via the Docker Hub. These can also be deployed through the same tool using a YAML format.
+The CLI can build OpenFaaS functions into Docker images that you can share via the Docker Hub. These can also be deployed through the same tool using a YAML format.
 
 Available at: https://github.com/alexellis/faas-cli
 
-> Note: currently Kubernetes FaaS functions can only be named a-zA-Z and dash (-).
+> Note: currently Kubernetes OpenFaaS functions can only be named a-zA-Z and dash (-).
 
-* Through the FaaS UI
+* Through the OpenFaaS UI
 
-The FaaS UI is accessible in a web-browser on port 31112 with the IP of your node.
+The OpenFaaS UI is accessible in a web-browser on port 31112 with the IP of your node.
 
 See below for a screenshot.
 
@@ -104,7 +110,7 @@ $ kubectl delete deployment/nodeinfo ; \
 
 **Function List**
 
-The function list is available on the gateway and is also used by the FaaS UI.
+The function list is available on the gateway and is also used by the OpenFaaS UI.
 
 Find the gateway service:
 
@@ -146,7 +152,7 @@ CPU count: 2
 Uptime: 19960
 ```
 
-The `--data` flag turns the `curl` from a GET to a POST. Right now FaaS functions are invoked via a POST to the API Gateway.
+The `--data` flag turns the `curl` from a GET to a POST. Right now OpenFaaS functions are invoked via a POST to the API Gateway.
 
 > The nodeinfo function also supports a parameter of `verbose` to view network adapters - to try this set the `--data` flag to `verbose`.
 
@@ -162,7 +168,7 @@ You can now use the `curl` example from above and you will see either of the two
 
 **Auto-scale your functions**
 
-Given enough load (> 5 requests/second) FaaS will auto-scale your service, you can test this out by opening up the Prometheus web-page and then generating load with Apache Bench or a while/true/curl bash loop.
+Given enough load (> 5 requests/second) OpenFaaS will auto-scale your service, you can test this out by opening up the Prometheus web-page and then generating load with Apache Bench or a while/true/curl bash loop.
 
 Here's an example you can use to generate load:
 
@@ -184,11 +190,11 @@ rate(gateway_function_invocation_total[20s])
 
 > It shows the rate the function has been invoked over a 20 second window.
 
-The [FaaS complete walk-through on Kubernetes Video](https://www.youtube.com/watch?v=0DbrLsUvaso) shows auto-scaling in action and how to use the Prometheus UI.
+The [OpenFaaS complete walk-through on Kubernetes Video](https://www.youtube.com/watch?v=0DbrLsUvaso) shows auto-scaling in action and how to use the Prometheus UI.
 
 **Test out the UI**
 
-You can also access the FaaS UI through the node's IP address and the NodePort we exposed earlier.
+You can also access the OpenFaaS UI through the node's IP address and the NodePort we exposed earlier.
 
 ```
 $ open http://$(minikube ip):31112/
@@ -202,9 +208,9 @@ If you've ever used the *Kubernetes dashboard* then this UI is a similar concept
 
 *Please Star the FaaS and FaaS-netes Github repo.*
 
-* [Main FaaS repo](https://github.com/alexellis/faas)
+* [Main OpenFaaS repo](https://github.com/alexellis/faas)
 
-Contributions are welcome - see the [contributing guide for FaaS](https://github.com/alexellis/faas/blob/master/CONTRIBUTING.md).
+Contributions are welcome - see the [contributing guide for OpenFaaS](https://github.com/alexellis/faas/blob/master/CONTRIBUTING.md).
 
-The [FaaS complete walk-through on Kubernetes Video](https://www.youtube.com/watch?v=0DbrLsUvaso) shows how to use Prometheus and the auto-scaling in action.
+The [OpenFaaS complete walk-through on Kubernetes Video](https://www.youtube.com/watch?v=0DbrLsUvaso) shows how to use Prometheus and the auto-scaling in action.
 
